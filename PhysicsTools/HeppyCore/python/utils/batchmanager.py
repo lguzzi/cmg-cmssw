@@ -282,6 +282,7 @@ class BatchManager:
         "LXPLUS"     : batch command is condor, and logged on lxplus
         "PSI"        : batch command is qsub, and logged to t3uiXX
         "NAF"        : batch command is qsub, and logged on naf
+        "MIB"        : batch command is qsub, and logged on hercules.hcms.it
         "IC"         : batch command is qsub, and logged on hep.ph.ic.ac.uk
         "LOCAL"      : batch command is nohup.
 
@@ -293,8 +294,9 @@ class BatchManager:
         onLxplus = hostName.startswith('lxplus')
         onLPC    = hostName.startswith('cmslpc')
         onPSI    = hostName.startswith('t3ui')
-        onNAF =  hostName.startswith('naf')
-
+        onNAF    = hostName.startswith('naf')
+        onIC     = False # [bug] missing definition. onIC is called below 
+        onMIB    = hostName.startswith('hercules')
         batchCmd = batch.split()[0]
 
         if batchCmd == 'bsub':
@@ -323,7 +325,10 @@ class BatchManager:
 
 
         elif batchCmd == "run_condor_simple.sh":
-            if not onLxplus:
+            if onMIB:
+                print 'running on MIB: %s from %s' %(batchCmd, hostName)
+                return 'MIB'
+            elif not onLxplus:
                 err = 'Cannot run %s on %s' % (batchCmd, hostName)
                 raise ValueError( err )
             else:
