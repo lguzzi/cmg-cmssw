@@ -12,6 +12,40 @@ from PhysicsTools.HeppyCore.utils.batchmanager import BatchManager
 
 from PhysicsTools.HeppyCore.framework.heppy_loop import split
 
+def batchScriptMIB(jobDir):
+   '''prepare a IC version of the batch script'''
+
+   cmssw_release   = os.environ['CMSSW_BASE']
+   grid_proxy_file = os.environ['X509_USER_PROXY']
+   script = """#!/bin/bash
+export X509_USER_PROXY={PRX}
+source /cvmfs/cms.cern.ch/cmsset_default.sh
+cd {DIR}
+cd {CMS}/src
+eval `scramv1 ru -sh`
+cd {DIR}
+echo 'running'
+python {CMS}/src/PhysicsTools/HeppyCore/python/framework/looper.py pycfg.py config.pck --options=options.json
+echo
+echo 'sending the job directory back'
+mv --backup=t Loop/* ./ && rm -r Loop
+""".format( DIR = jobDir,
+            CMS = cmssw_release  ,
+            PRX = grid_proxy_file)
+   return script
+
+def batchScriptLocal(  remoteDir, index ):
+   '''prepare a local version of the batch script, to run using nohup'''
+
+   script = """#!/bin/bash
+echo 'running'
+python $CMSSW_BASE/src/PhysicsTools/HeppyCore/python/framework/looper.py pycfg.py config.pck --options=options.json
+echo
+echo 'sending the job directory back'
+mv Loop/* ./
+""" 
+   return script
+
 def batchScriptPADOVA( index, jobDir='./'):
    '''prepare the LSF version of the batch script, to run on LSF'''
    script = """#!/bin/bash
@@ -349,6 +383,8 @@ class MyBatchManager( BatchManager ):
 	   scriptFile.write( batchScriptPISA( storeDir, value) ) 	
        elif mode == 'PADOVA' :
            scriptFile.write( batchScriptPADOVA( value, jobDir) )        
+       elif mode == 'MIB':
+           scriptFile.write( batchScriptMIB(jobDir) )
        elif mode == 'IC':
            scriptFile.write( batchScriptIC(jobDir) )
        else: raise RuntimeError("Unsupported mode %s" % mode)
