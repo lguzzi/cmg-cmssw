@@ -644,11 +644,11 @@ class Events:
             return self._mode
         filenamesSVec = ROOT.vector("string") ()
         for name in self._filenames:
-            filenamesSVec.push_back (name)
+            filenamesSVec.push_back (str(name))
         if self._secondaryFilenames:
             secondarySVec =  ROOT.vector("string") ()
             for name in self._secondaryFilenames:
-                secondarySVec.push_back (name)
+                secondarySVec.push_back (str(name))
             self._event = ROOT.fwlite.MultiChainEvent (filenamesSVec,
                                                        secondarySVec)
             self._mode = 'multi'
