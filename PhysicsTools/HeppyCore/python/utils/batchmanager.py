@@ -327,7 +327,7 @@ class BatchManager:
 
         elif batchCmd == "run_condor_simple.sh":
             if onMIB:
-                print 'running on MIB: %s from %s' %(batchCmd, hostName)
+                print('running on MIB: %s from %s' %(batchCmd, hostName))
                 return 'MIB'
             elif not onLxplus:
                 err = 'Cannot run %s on %s' % (batchCmd, hostName)
