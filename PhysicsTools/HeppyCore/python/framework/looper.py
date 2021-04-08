@@ -9,7 +9,7 @@ import imp
 import logging
 import pprint
 from math import ceil
-from .event import Event
+from PhysicsTools.HeppyCore.framework.event import Event
 import timeit
 import resource
 import json
